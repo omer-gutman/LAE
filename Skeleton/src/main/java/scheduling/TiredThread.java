@@ -55,26 +55,80 @@ public class TiredThread extends Thread implements Comparable<TiredThread> {
      * This method is non-blocking: if the worker is not ready to accept a task,
      * it throws IllegalStateException.
      */
+
+    // נותן משימה לעובד
+    // אם העובד לא מוכן לקבל משימה, זורק חריגה
     public void newTask(Runnable task) {
-       // TODO
+       if (!handoff.offer(task)) {
+            throw new IllegalStateException("Worker " + id + " is not ready to accept a new task.");
+        }
     }
 
     /**
      * Request this worker to stop after finishing current task.
      * Inserts a poison pill so the worker wakes up and exits.
      */
+
+
+    // אם העובד עסוק הוא יסיים את המשימה הנוכחית ואז יפסיק
+    // עובד לפי אם התור מלא
     public void shutdown() {
-       // TODO
+       try {
+            handoff.put(POISON_PILL);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupt status
+        }
     }
 
     @Override
     public void run() {
-       // TODO
+       while (alive.get()) {
+            try {
+                // 1.ממתין למשימה חדשה, מתייבש ... 
+                Runnable task = handoff.take();
+
+                long now = System.nanoTime();
+                long idleDuration = now - idleStartTime.get();
+                timeIdle.addAndGet(idleDuration);
+
+                // 2. בודק אם המשימה היא פקודת עצירה
+                if (task == POISON_PILL) {
+                    alive.set(false);
+                    break;
+                }
+
+                // 3. מבצע את המשימה
+                busy.set(true);
+                long startWork = System.nanoTime();
+                try {
+                    task.run();
+                } catch (RuntimeException e) {
+                    //  מונע קריסת העובד במקרה של חריגה במשימה
+                    System.err.println("Task in Worker " + id + " failed: " + e.getMessage());
+                } finally {
+                    long endWork = System.nanoTime();
+                    long workDuration = endWork - startWork;
+                    
+                    // 4. מעדכן מדדים
+                    timeUsed.addAndGet(workDuration);
+                    busy.set(false);
+                    
+                    // מאפס את טיימר ההמתנה להמתנה הבאה
+                    idleStartTime.set(System.nanoTime());
+                }
+
+            } catch (InterruptedException e) {
+                // אם העובד מופרע בזמן ההמתנה, מתייחסים לכך כאות לעצירה
+                alive.set(false);
+                break;
+            }
+        }
     }
 
     @Override
     public int compareTo(TiredThread o) {
-        // TODO
-        return 0;
+        // בוחן עייפות בין שני עובדים
+        // עובד עם עייפות נמוכה יותר יקבל עדיפות גבוהה יותר
+        return Double.compare(this.getFatigue(), o.getFatigue());
     }
 }
