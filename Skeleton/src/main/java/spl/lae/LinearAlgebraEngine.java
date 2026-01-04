@@ -28,7 +28,7 @@ public class LinearAlgebraEngine {
         // 2. לופ עד שכל העץ ״נפתר״
         while (true) {
             // (בעצם צומת שילדיו הם מטריצות) נמצא את הצומת הבאה הניתנת לפתרון
-            // (צומת זה pandas ועלים זה מטריצות)
+            // (צומת זה pemdas ועלים זה מטריצות)
             ComputationNode node = computationRoot.findResolvable();
 
             // אם לא נמצא צומת כזה, יש לבדוק אם השורש נפתר
@@ -261,5 +261,10 @@ public class LinearAlgebraEngine {
    public String getWorkerReport() {
         // יוצר דוח על כל העובדים
         return executor.getWorkerReport();
+    }
+
+    public void shutdown() throws InterruptedException {
+        // הposion pill שלא ישארו עובדים רצים ברקע
+        executor.shutdown();
     }
 }
