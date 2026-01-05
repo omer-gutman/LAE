@@ -57,7 +57,7 @@ public class LinearAlgebraTest {
         v.negate();
 
         // נבדוק שהתוצאה היא [-1, 2]
-        // כו*** של העברית הזא ת... אבל הבנתם
+        // כו*** של העברית הזאת... אבל הבנתם
         assertEquals(-1.0, v.get(0), 0.001);
         assertEquals(2.0, v.get(1), 0.001);
     }
@@ -90,16 +90,32 @@ public class LinearAlgebraTest {
 
     @Test
     public void testDotProductDimensionMismatch() {
-        // ננסה לבצע dot product של וקטורים באורך שונה
+       // ננסה לבצע dot product של וקטורים באורך שונה
         double[] d1 = {1.0, 2.0};
         double[] d2 = {1.0, 2.0, 3.0};
         
         SharedVector v1 = new SharedVector(d1, VectorOrientation.ROW_MAJOR);
         SharedVector v2 = new SharedVector(d2, VectorOrientation.COLUMN_MAJOR);
-
         // אמור לזרוק IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () -> {
             v1.dot(v2);
         }, "Should throw exception for different lengths");
+    }
+
+    @Test
+    public void testMatrixAdditionDimensionMismatch() {
+        // Setup: Vector A has length 2, Vector B has length 3
+        double[] rowA = {1.0, 2.0};
+        double[] rowB = {1.0, 2.0, 3.0};
+
+        SharedVector vA = new SharedVector(rowA, VectorOrientation.ROW_MAJOR);
+        SharedVector vB = new SharedVector(rowB, VectorOrientation.ROW_MAJOR);
+
+        // Attempt to add mismatching vectors
+        // Expecting either IllegalArgumentException (if you added the check) 
+        // or IndexOutOfBoundsException (if Java catches it natively)
+        assertThrows(Exception.class, () -> {
+            vA.add(vB);
+        }, "Should throw an exception when adding vectors of different sizes");
     }
 }

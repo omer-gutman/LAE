@@ -5,17 +5,14 @@ public class SharedMatrix {
     private volatile SharedVector[] vectors = {}; // underlying vectors
 
     public SharedMatrix() {
-        // TODO: initialize empty matrix
         this.vectors = new SharedVector[0];
     }
 
     public SharedMatrix(double[][] matrix) {
-        // TODO: construct matrix as row-major SharedVectors
         loadRowMajor(matrix);
     }
 
     public void loadRowMajor(double[][] matrix) {
-        // TODO: replace internal data with new row-major matrix
         if(matrix.length == 0) {
             this.vectors = new SharedVector[0];
             return;
@@ -27,7 +24,6 @@ public class SharedMatrix {
     }
 
     public void loadColumnMajor(double[][] matrix) {
-        // TODO: replace internal data with new column-major matrix
         if(matrix.length == 0) {
             this.vectors = new SharedVector[0];
             return;
@@ -43,7 +39,6 @@ public class SharedMatrix {
     }
 
     public double[][] readRowMajor() {
-        // TODO: return matrix contents as a row-major double[][]
         if(this.vectors.length == 0) {
             return new double[0][0];
         }
@@ -68,43 +63,36 @@ public class SharedMatrix {
     }
 
     public SharedVector get(int index) {
-        // TODO: return vector at index
         return this.vectors[index];
     }
 
     public int length() {
-        // TODO: return number of stored vectors
         return this.vectors.length;
     }
 
     public VectorOrientation getOrientation() {
-        // TODO: return orientation
         return this.vectors[0].getOrientation();
     }
 
     private void acquireAllVectorReadLocks(SharedVector[] vecs) {
-        // TODO: acquire read lock for each vector
         for(SharedVector vec : vecs) {
             vec.readLock();
         }
     }
 
     private void releaseAllVectorReadLocks(SharedVector[] vecs) {
-        // TODO: release read locks
         for(SharedVector vec : vecs) {
             vec.readUnlock();
         }
     }
 
     private void acquireAllVectorWriteLocks(SharedVector[] vecs) {
-        // TODO: acquire write lock for each vector
         for(SharedVector vec : vecs) {
             vec.writeLock();
         }
     }
 
     private void releaseAllVectorWriteLocks(SharedVector[] vecs) {
-        // TODO: release write locks
         for(SharedVector vec : vecs) {
             vec.writeUnlock();
         }

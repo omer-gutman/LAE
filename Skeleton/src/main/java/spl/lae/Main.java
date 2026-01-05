@@ -25,6 +25,7 @@ public class Main {
         try {
             // 2. נתרגם את הקלט לעץ חישובי
             ComputationNode root = parser.parse(inputPath);
+            normalizeTree(root);
 
             // 3. אעאאעאעא נריץ את החישוב
             // בעצם כל העבודה המקבלית נעשית כאן... מחזיר את השורש הפותר
@@ -53,6 +54,17 @@ public class Main {
             
             // דוח על פעילות העובדים
             System.out.println(engine.getWorkerReport());
+        }
+    }
+
+    private static void normalizeTree(ComputationNode node) {
+        // נתחיל רקורסיה על כל הילדים
+        if (node.getChildren() != null) {
+            for (ComputationNode child : node.getChildren()) {
+                normalizeTree(child);
+            }
+            // נסדר כמו שרוצים...
+            node.associativeNesting();
         }
     }
 }
